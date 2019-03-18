@@ -1,24 +1,34 @@
-SHELL:=/bin/bash
+SHELL := /bin/bash
 
-OPENCV_VERSION :=
-ERROR_MESSAGE :=
-
-CC := g++
-CXXFLAGS = -g -Wall -std=c++11
-
-# [gcc -l -L option flags for library link](https://www.rapidtables.com/code/linux/gcc/gcc-l.html)
-# [gcc -I option flag (include directory)](https://www.rapidtables.com/code/linux/gcc/gcc-i.html)
-INC := ${HOME}/.opencv/install/OpenCV-${OPENCV_VERSION}/include/opencv4
-INC := $(addprefix -I,${INC})
-LDLIBS1 :=
-LDLIBS2 :=
-LDLIBS := $(addprefix -L,${LDLIBS1}) $(addprefix -l,${LDLIBS2})
-LINK.cc := $(CXX) $(CXXFLAGS) $(CPPFLAGS) ${LDFLAGS} $(TARGET_ARCH)
-
+OPENCV_VERSION := 4.0.1
+INC :=
+LDLIBS  :=
 OBJECTS := $(patsubst %.cpp,%.o,$(wildcard *.cpp))
-TARGET := check
+TARGET := main
+
+#===============================================================================
+# v4.0.1
+ifeq (${OPENCV_VERSION}, 4.0.1)
+PKG_CONFIG_PATH := ${HOME}/.opencv/install/OpenCV-${OPENCV_VERSION}/lib/pkgconfig
+INC := ${INC} `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --cflags opencv4`
+# --static : static library (.a)
+LDLIBS  := ${LDLIBS} `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --static --libs opencv4`
+endif
+#===============================================================================
+ifeq (${OPENCV_VERSION}, 3.4.5)
+PKG_CONFIG_PATH := ${HOME}/.opencv/install/OpenCV-${OPENCV_VERSION}/lib/pkgconfig
+INC := ${INC} `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --cflags opencv`
+# --static : static library (.a)
+LDLIBS := ${LDLIBS} `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --static --libs opencv`
+endif
+
+#===============================================================================
+CXX := g++
+CXXFLAGS = -g -Wall -std=c++11
+LINK.cc := $(CXX) $(CXXFLAGS) $(CPPFLAGS) ${LDFLAGS} $(TARGET_ARCH)
 export
 
+#===============================================================================
 .DEFAULT_GOAL := run
 
 .PHONY : run
@@ -27,16 +37,16 @@ run :
 	./${TARGET}
 
 %.o : %.cpp
-	@$(MAKE) preprocess
+	@$(MAKE) check
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $^ ${INC} ${LDLIBS} -c -o $@
 
 ${TARGET} : ${OBJECTS}
-	@$(MAKE) preprocess
+	@$(MAKE) check
 	$(LINK.cc) $(TARGET_ARCH) $^ ${LDLIBS} -o $@
 
 #===============================================================================
-.PHONY : preprocess
-preprocess :
+.PHONY : check
+check :
 # [Bash - adding color - NoskeWiki printf zsh](http://www.andrewnoske.com/wiki/Bash_-_adding_color)
 ifndef OPENCV_VERSION
 	@printf "\e[101m Variable OPENCV_VERSION does not set. \e[0m \n"
@@ -55,7 +65,7 @@ clean :
 # INSTALL
 .PHONY : install-opencv 
 install-opencv : ## install OPENCV
-	@${MAKE} preprocess
+	@${MAKE} check
 	OPENCV_VERSION=${OPENCV_VERSION} ./install-opencv.bash.sh
 
 
