@@ -1,25 +1,50 @@
 SHELL := /bin/bash
 
+#===============================================================================
 OPENCV_VERSION := 4.0.1
+# "static" or "shared"
+OPENCV_LIB := static
+
+#===============================================================================
 INC :=
 LDLIBS  :=
 OBJECTS := $(patsubst %.cpp,%.o,$(wildcard *.cpp))
 TARGET := main
 
 #===============================================================================
-# v4.0.1
-ifeq (${OPENCV_VERSION}, 4.0.1)
 PKG_CONFIG_PATH := ${HOME}/.opencv/install/OpenCV-${OPENCV_VERSION}/lib/pkgconfig
-INC := ${INC} `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --cflags opencv4`
+#=======================================
+# v4.*
+ifneq ($(shell echo ${OPENCV_VERSION} | grep -E "4\.[0-9]+\.[0-9]+"), )
+INC += `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --cflags opencv4`
+# Select `static` or 'shared' OPENCV LIB 
 # --static : static library (.a)
-LDLIBS  := ${LDLIBS} `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --static --libs opencv4`
+ifeq (${OPENCV_LIB}, shared)
+LDLIBS += `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --libs opencv4`
+else ifeq (${OPENCV_LIB}, static)
+LDLIBS += `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --static --libs opencv4`
+else
+ERROR_MESSAGE := 'OPENCV_LIB' variable should be 'static' or 'shared'.
+$(error "${ERROR_MESSAGE}")
 endif
-#===============================================================================
-ifeq (${OPENCV_VERSION}, 3.4.5)
-PKG_CONFIG_PATH := ${HOME}/.opencv/install/OpenCV-${OPENCV_VERSION}/lib/pkgconfig
-INC := ${INC} `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --cflags opencv`
-# --static : static library (.a)
-LDLIBS := ${LDLIBS} `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --static --libs opencv`
+#=======================================
+# v3.*
+else ifneq ($(shell echo ${OPENCV_VERSION} | grep -E "3\.[0-9]+\.[0-9]+"), )
+INC += `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --cflags opencv`
+# Select `static` or 'shared' OPENCV LIB 
+ifeq (${OPENCV_LIB}, shared)
+LDLIBS += `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --libs opencv`
+else ifeq (${OPENCV_LIB}, static)
+LDLIBS += `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --static --libs opencv`
+else
+ERROR_MESSAGE := 'OPENCV_LIB' variable should be 'static' or 'shared'.
+$(error "${ERROR_MESSAGE}")
+endif
+#=======================================
+# Others
+else
+ERROR_MESSAGE := 'OPENCV_VERSION' variable (${OPENCV_VERSION}) is not supported.
+$(error "${ERROR_MESSAGE}")
 endif
 
 #===============================================================================
@@ -30,6 +55,11 @@ export
 
 #===============================================================================
 .DEFAULT_GOAL := run
+
+.PHONY : debug
+debug:
+	echo ${INC}
+	echo ${LDLIBS}
 
 .PHONY : run
 run :
