@@ -22,6 +22,9 @@ if [ ! -d "${OPENCV_DIR}/opencv" ]; then
 fi
 
 cd "${OPENCV_DIR}/opencv"
+git checkout master
+git fetch
+git pull --all
 git checkout ${OPENCV_VERSION}
 cd ..
  
@@ -32,6 +35,9 @@ if [ ! -d "${OPENCV_DIR}/opencv_contrib" ]; then
   git clone https://github.com/opencv/opencv_contrib.git
 fi
 cd "${OPENCV_DIR}/opencv_contrib"
+git checkout master
+git fetch
+git pull --all
 git checkout ${OPENCV_VERSION}
 
 

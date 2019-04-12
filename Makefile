@@ -2,48 +2,74 @@ SHELL := /bin/bash
 
 OS_VERSION :=
 OPENCV_VERSION := 4.0.1
+# "static" or "shared"
+OPENCV_LIB := static
+
+#===============================================================================
 INC :=
 LDLIBS  :=
 OBJECTS := $(patsubst %.cpp,%.o,$(wildcard *.cpp))
-TARGET := main
+CLEAN_LIST := check-opencv-version
+CLEAN_LIST := ${CLEAN_LIST} $(addsuffix .o,${CLEAN_LIST})
 
 #===============================================================================
-# v4.0.1
-ifeq (${OPENCV_VERSION}, 4.0.1)
 PKG_CONFIG_PATH := ${HOME}/.opencv/install/OpenCV-${OPENCV_VERSION}/lib/pkgconfig
-INC := ${INC} `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --cflags opencv4`
+#=======================================
+# v4.*
+ifneq ($(shell echo ${OPENCV_VERSION} | grep -E "4\.[0-9]+\.[0-9]+"), )
+INC += `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --cflags opencv4`
+# Select `static` or 'shared' OPENCV LIB 
 # --static : static library (.a)
-LDLIBS  := ${LDLIBS} `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --static --libs opencv4`
+ifeq (${OPENCV_LIB}, shared)
+LDLIBS += `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --libs opencv4`
+else ifeq (${OPENCV_LIB}, static)
+LDLIBS += `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --static --libs opencv4`
+else
+ERROR_MESSAGE := 'OPENCV_LIB' variable should be 'static' or 'shared'.
+$(error "${ERROR_MESSAGE}")
 endif
-#===============================================================================
-ifeq (${OPENCV_VERSION}, 3.4.5)
-PKG_CONFIG_PATH := ${HOME}/.opencv/install/OpenCV-${OPENCV_VERSION}/lib/pkgconfig
-INC := ${INC} `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --cflags opencv`
-# --static : static library (.a)
-LDLIBS := ${LDLIBS} `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --static --libs opencv`
+#=======================================
+# v3.*
+else ifneq ($(shell echo ${OPENCV_VERSION} | grep -E "3\.[0-9]+\.[0-9]+"), )
+INC += `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --cflags opencv`
+# Select `static` or 'shared' OPENCV LIB 
+ifeq (${OPENCV_LIB}, shared)
+LDLIBS += `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --libs opencv`
+else ifeq (${OPENCV_LIB}, static)
+LDLIBS += `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --static --libs opencv`
+else
+ERROR_MESSAGE := 'OPENCV_LIB' variable should be 'static' or 'shared'.
+$(error "${ERROR_MESSAGE}")
+endif
+#=======================================
+# Others
+else
+ERROR_MESSAGE := 'OPENCV_VERSION' variable (${OPENCV_VERSION}) is not supported.
+$(error "${ERROR_MESSAGE}")
 endif
 
 #===============================================================================
 CXX := g++
 CXXFLAGS = -g -Wall -std=c++11
-LINK.cc := $(CXX) $(CXXFLAGS) $(CPPFLAGS) ${LDFLAGS} $(TARGET_ARCH)
+COMPILE.cc := $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+LINK.cc    := $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH)
 export
 
 #===============================================================================
 .DEFAULT_GOAL := run
 
-.PHONY : run
-run :
-	${MAKE} ${TARGET}
-	./${TARGET}
+.PHONY : debug
+debug:
+	echo ${INC}
+	echo ${LDLIBS}
 
 %.o : %.cpp
 	@$(MAKE) check
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $^ ${INC} ${LDLIBS} -c -o $@
+	${COMPILE.cc} $^ ${INC} -o $@
 
-${TARGET} : ${OBJECTS}
+check-opencv-version : ${OBJECTS}
 	@$(MAKE) check
-	$(LINK.cc) $(TARGET_ARCH) $^ ${LDLIBS} -o $@
+	$(LINK.cc) $^ ${LDLIBS} -o $@
 
 #===============================================================================
 .PHONY : check
@@ -58,9 +84,10 @@ endif
 error :  ## errors処理を外部に記述することで好きなエラーメッセージをprintfで記述可能.
 	$(error "${ERROR_MESSAGE}")
 
-.PHONY : clean
+.phony : clean
 clean :
-	-${RM} ${TARGET} ${OBJECTS} *~ .*~ core
+	-${RM} -rf ${CLEAN_LIST} *~ .*~ core
+
 
 #===============================================================================
 # Ubuntu Dependency
