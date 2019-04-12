@@ -1,5 +1,6 @@
 SHELL := /bin/bash
 
+OS_VERSION :=
 OPENCV_VERSION := 4.0.1
 INC :=
 LDLIBS  :=
@@ -62,9 +63,23 @@ clean :
 	-${RM} ${TARGET} ${OBJECTS} *~ .*~ core
 
 #===============================================================================
+# Ubuntu Dependency
+.PHONY : ubuntu16.04
+ubuntu16.04 :
+	./dependency-ubuntu16.04.bash.sh
+
+.PHONY : ubuntu18.04
+ubuntu18.04 :
+	./dependency-ubuntu18.04.bash.sh
+
 # INSTALL
 .PHONY : install-opencv 
 install-opencv : ## install OPENCV
+ifndef OS_VERSION
+	@printf "\e[101m Variable OS_VERSION does not set. \e[0m \n"
+	@${MAKE} error ERROR_MESSAGE="OS_VERSION"
+endif
+	${MAKE} ${OS_VERSION}
 	@${MAKE} check
 	OPENCV_VERSION=${OPENCV_VERSION} ./install-opencv.bash.sh
 
