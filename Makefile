@@ -9,7 +9,8 @@ OPENCV_LIB := static
 INC :=
 LDLIBS  :=
 OBJECTS := $(patsubst %.cpp,%.o,$(wildcard *.cpp))
-TARGET := main
+CLEAN_LIST := check-opencv-version
+CLEAN_LIST := ${CLEAN_LIST} $(addsuffix .o,${CLEAN_LIST})
 
 #===============================================================================
 PKG_CONFIG_PATH := ${HOME}/.opencv/install/OpenCV-${OPENCV_VERSION}/lib/pkgconfig
@@ -50,7 +51,8 @@ endif
 #===============================================================================
 CXX := g++
 CXXFLAGS = -g -Wall -std=c++11
-LINK.cc := $(CXX) $(CXXFLAGS) $(CPPFLAGS) ${LDFLAGS} $(TARGET_ARCH)
+COMPILE.cc := $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+LINK.cc    := $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH)
 export
 
 #===============================================================================
@@ -61,18 +63,13 @@ debug:
 	echo ${INC}
 	echo ${LDLIBS}
 
-.PHONY : run
-run :
-	${MAKE} ${TARGET}
-	./${TARGET}
-
 %.o : %.cpp
 	@$(MAKE) check
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $^ ${INC} ${LDLIBS} -c -o $@
+	${COMPILE.cc} $^ ${INC} -o $@
 
-${TARGET} : ${OBJECTS}
+check-opencv-version : ${OBJECTS}
 	@$(MAKE) check
-	$(LINK.cc) $(TARGET_ARCH) $^ ${LDLIBS} -o $@
+	$(LINK.cc) $^ ${LDLIBS} -o $@
 
 #===============================================================================
 .PHONY : check
@@ -87,9 +84,10 @@ endif
 error :  ## errors処理を外部に記述することで好きなエラーメッセージをprintfで記述可能.
 	$(error "${ERROR_MESSAGE}")
 
-.PHONY : clean
+.phony : clean
 clean :
-	-${RM} ${TARGET} ${OBJECTS} *~ .*~ core
+	-${RM} -rf ${CLEAN_LIST} *~ .*~ core
+
 
 #===============================================================================
 # INSTALL
