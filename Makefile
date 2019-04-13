@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 
 OS_VERSION :=
-OPENCV_VERSION := 4.0.1
+OPENCV_VERSION :=
 # "static" or "shared"
 OPENCV_LIB := static
 
@@ -13,6 +13,10 @@ CLEAN_LIST := check-opencv-version
 CLEAN_LIST := ${CLEAN_LIST} $(addsuffix .o,${CLEAN_LIST})
 
 #===============================================================================
+ifndef OPENCV_VERSION
+$(error "'OPENCV_VERSION' variable should be set.")
+endif
+#=======================================
 PKG_CONFIG_PATH := ${HOME}/.opencv/install/OpenCV-${OPENCV_VERSION}/lib/pkgconfig
 #=======================================
 # v4.*
