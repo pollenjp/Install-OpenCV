@@ -5,13 +5,19 @@ OPENCV_VERSION :=
 # "static" or "shared"
 OPENCV_LIBS := static
 
-#===============================================================================
+CXX := g++
+CXXFLAGS = -g -Wall -std=c++11
+COMPILE.cc := $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+LINK.cc    := $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH)
+
 INC :=
 LDLIBS  :=
 OBJECTS := $(patsubst %.cpp,%.o,$(wildcard *.cpp))
 CLEAN_LIST := check-opencv-version
 CLEAN_LIST := ${CLEAN_LIST} $(addsuffix .o,${CLEAN_LIST})
 
+#===============================================================================
+#===============================================================================
 #===============================================================================
 ifndef OPENCV_VERSION
 $(error "'OPENCV_VERSION' variable should be set.")
@@ -51,12 +57,10 @@ else
 ERROR_MESSAGE := 'OPENCV_VERSION' variable (${OPENCV_VERSION}) is not supported.
 $(error "${ERROR_MESSAGE}")
 endif
-
 #===============================================================================
-CXX := g++
-CXXFLAGS = -g -Wall -std=c++11
-COMPILE.cc := $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
-LINK.cc    := $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH)
+#===============================================================================
+#===============================================================================
+
 export
 
 #===============================================================================
@@ -107,7 +111,7 @@ ubuntu18.04 :
 .PHONY : install-opencv 
 install-opencv : ## install OPENCV
 ifndef OS_VERSION
-	@printf "\e[101m Variable OS_VERSION does not set. \e[0m \n"
+	@printf "\e[101m %s \e[0m \n" "Variable OS_VERSION does not set. ('ubuntu16.04' or 'ubuntu18.04')"
 	@${MAKE} error ERROR_MESSAGE="OS_VERSION"
 endif
 	${MAKE} ${OS_VERSION}

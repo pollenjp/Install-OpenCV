@@ -4,11 +4,17 @@
 ## Installation
 
 ```
- % make install-opencv OPENCV_VERSION=4.1.0 OS_VERSION=ubuntu16.04
+ % make install-opencv \
+    OPENCV_VERSION=4.1.0 \
+    OPENCV_LIBS=static \
+    OS_VERSION=ubuntu16.04
 ```
 
 ```
- % make install-opencv OPENCV_VERSION=4.1.0 OS_VERSION=ubuntu18.04
+ % make install-opencv
+    OPENCV_VERSION=4.1.0 \
+    OPENCV_LIBS=static \
+    OS_VERSION=ubuntu18.04
 ```
 
 - Checked `OPENCV_VERSION`
