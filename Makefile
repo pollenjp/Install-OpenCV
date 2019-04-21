@@ -3,7 +3,7 @@ SHELL := /bin/bash
 OS_VERSION :=
 OPENCV_VERSION :=
 # "static" or "shared"
-OPENCV_LIB := static
+OPENCV_LIBS := static
 
 #===============================================================================
 INC :=
@@ -17,19 +17,19 @@ ifndef OPENCV_VERSION
 $(error "'OPENCV_VERSION' variable should be set.")
 endif
 #=======================================
-PKG_CONFIG_PATH := ${HOME}/.opencv/install/OpenCV-${OPENCV_VERSION}/lib/pkgconfig
+PKG_CONFIG_PATH := ${HOME}/.opencv/install/OpenCV-${OPENCV_VERSION}/${OPENCV_LIBS}/lib/pkgconfig
 #=======================================
 # v4.*
 ifneq ($(shell echo ${OPENCV_VERSION} | grep -E "4\.[0-9]+\.[0-9]+"), )
 INC += `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --cflags opencv4`
 # Select `static` or 'shared' OPENCV LIB 
 # --static : static library (.a)
-ifeq (${OPENCV_LIB}, shared)
+ifeq (${OPENCV_LIBS}, shared)
 LDLIBS += `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --libs opencv4`
-else ifeq (${OPENCV_LIB}, static)
+else ifeq (${OPENCV_LIBS}, static)
 LDLIBS += `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --static --libs opencv4`
 else
-ERROR_MESSAGE := 'OPENCV_LIB' variable should be 'static' or 'shared'.
+ERROR_MESSAGE := 'OPENCV_LIBS' variable should be 'static' or 'shared'.
 $(error "${ERROR_MESSAGE}")
 endif
 #=======================================
@@ -37,12 +37,12 @@ endif
 else ifneq ($(shell echo ${OPENCV_VERSION} | grep -E "3\.[0-9]+\.[0-9]+"), )
 INC += `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --cflags opencv`
 # Select `static` or 'shared' OPENCV LIB 
-ifeq (${OPENCV_LIB}, shared)
+ifeq (${OPENCV_LIBS}, shared)
 LDLIBS += `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --libs opencv`
-else ifeq (${OPENCV_LIB}, static)
+else ifeq (${OPENCV_LIBS}, static)
 LDLIBS += `PKG_CONFIG_PATH=${PKG_CONFIG_PATH} pkg-config --static --libs opencv`
 else
-ERROR_MESSAGE := 'OPENCV_LIB' variable should be 'static' or 'shared'.
+ERROR_MESSAGE := 'OPENCV_LIBS' variable should be 'static' or 'shared'.
 $(error "${ERROR_MESSAGE}")
 endif
 #=======================================
@@ -112,6 +112,6 @@ ifndef OS_VERSION
 endif
 	${MAKE} ${OS_VERSION}
 	@${MAKE} check
-	OPENCV_VERSION=${OPENCV_VERSION} ./install-opencv.bash.sh
+	OPENCV_VERSION=${OPENCV_VERSION} OPENCV_LIBS=${OPENCV_LIBS} ./install-opencv.bash.sh
 
 

@@ -1,8 +1,22 @@
 #!/bin/bash -eux
+
+# [bash - What's a concise way to check that environment variables are set in a Unix shell script? - Stack Overflow](https://stackoverflow.com/a/307735/9316234)
 #OPENCV_VERSION=4.0.1
-#NOTCLEAN  # flag : buildディレクトリルが存在していればそれを使う
+: "${OPENCV_VERSION:?Need to be set. (ex: '$ OPENCV_VERSION=4.1.0 ./xxx.sh')}"
+# 'shared' or 'static'
+: "${OPENCV_LIBS:?Need to be set. 'static' or 'shared' (ex: '$ OPENCV_LIBS=shared ./xxx.sh')}"
+
+if [ ${OPENCV_LIBS} == "static" ]; then
+    BUILD_SHARED_LIBS=OFF
+elif [ ${OPENCV_LIBS} == "shared" ]; then
+    BUILD_SHARED_LIBS=ON
+else
+    printf "\e[101m %s \e[0m \n" "Variable OPENCV_LIBS should be 'static' or 'shared'."
+    exit 1
+fi
+
 OPENCV_DIR=${HOME}/.opencv
-CMAKE_INSTALL_PREFIX=${OPENCV_DIR}/install/OpenCV-${OPENCV_VERSION}
+CMAKE_INSTALL_PREFIX=${OPENCV_DIR}/install/OpenCV-${OPENCV_VERSION}/${OPENCV_LIBS}
 # current working directory
 CWD=$(pwd)
 
@@ -56,7 +70,7 @@ echo ${directory1}
 
 # [How to set C or C++ compiler for CMake – Code Yarns](https://codeyarns.com/2013/12/24/how-to-set-c-or-c-compiler-for-cmake/)
 cmake \
-      -D BUILD_SHARED_LIBS=OFF \
+      -D BUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} \
       -D CMAKE_C_COMPILER=/usr/bin/cc \
       -D CMAKE_CXX_COMPILER=/usr/bin/c++ \
       -D CMAKE_CXX_FLAGS="-std=c++11" \

@@ -22,7 +22,7 @@
 ## OpenCVのバージョンチェック
 
 ```
- % make OPENCV_VERSION=4.0.1 OPENCV_LIB=static
+ % make OPENCV_VERSION=4.0.1 OPENCV_LIBS=static
 make main
 make[1]: ディレクトリ '/media/pollenjp/DATA2TB/workdir/git/Install-OpenCV' に入ります
 make[2]: ディレクトリ '/media/pollenjp/DATA2TB/workdir/git/Install-OpenCV' に入ります
