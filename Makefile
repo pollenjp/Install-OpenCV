@@ -22,6 +22,9 @@ CLEAN_LIST := ${CLEAN_LIST} $(addsuffix .o,${CLEAN_LIST})
 ifndef OPENCV_VERSION
 $(error "'OPENCV_VERSION' variable should be set.")
 endif
+ifndef OPENCV_LIBS
+$(error "'OPENCV_LIBS' variable should be set.")
+endif
 #=======================================
 PKG_CONFIG_PATH := ${HOME}/.opencv/install/OpenCV-${OPENCV_VERSION}/${OPENCV_LIBS}/lib/pkgconfig
 #=======================================
