@@ -2,7 +2,7 @@
 
 # Reference
 # [Install OpenCV 4 on Ubuntu 16.04 (C++ and Python) | Learn OpenCV](https://www.learnopencv.com/install-opencv-4-on-ubuntu-16-04/)
-# (https://www.learnopencv.com/install-opencv-4-on-ubuntu-18-04/)
+# [Install OpenCV 4 on Ubuntu 18.04 (C++ and Python) | Learn OpenCV](https://www.learnopencv.com/install-opencv-4-on-ubuntu-18-04/)
 
 # [memo on hackmd.io](https://hackmd.io/MVHtNQarSouT_b9H9yAa_w)
 # [OpenCV: Installation in Linux](https://docs.opencv.org/4.0.1/d7/d9f/tutorial_linux_install.html)
@@ -12,8 +12,8 @@ sudo apt -y install software-properties-common
 # ref : [command line - how to check if PPA is already added to apt sources list in a bash script - Ask Ubuntu](https://askubuntu.com/a/561628/807051)
 the_ppa="deb http://security.ubuntu.com/ubuntu xenial-security main"
 # [bashの変数内文字列置換まとめ - Qiita](https://qiita.com/aosho235/items/c36568830a8d47288284#dirname)
-if ! grep -q "^${the_ppa// /\ }" /etc/apt/sources.list /etc/apt/sources.list.d/*; then sudo add-apt-repository ""
-    sudo add-apt-repository ${the_ppa}
+if ! grep -q "^${the_ppa// /\ }" /etc/apt/sources.list /etc/apt/sources.list.d/*; then
+    sudo add-apt-repository "${the_ppa}"
 fi
 sudo apt update
 
