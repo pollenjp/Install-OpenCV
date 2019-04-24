@@ -11,7 +11,7 @@
 ```
 
 ```
- % make install-opencv
+ % make install-opencv \
     OPENCV_VERSION=4.1.0 \
     OPENCV_LIBS=static \
     OS_VERSION=ubuntu18.04
