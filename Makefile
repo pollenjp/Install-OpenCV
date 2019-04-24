@@ -22,9 +22,13 @@ CLEAN_LIST := ${CLEAN_LIST} $(addsuffix .o,${CLEAN_LIST})
 ifndef OPENCV_VERSION
 $(error "'OPENCV_VERSION' variable should be set.")
 endif
-ifndef OPENCV_LIBS
-$(error "'OPENCV_LIBS' variable should be set.")
+
+ifneq (${OPENCV_LIBS}, static)
+ifneq (${OPENCV_LIBS}, shared)
+$(error "'OPENCV_LIBS' variable should be set. ('static' or 'shared')")
 endif
+endif
+
 #=======================================
 PKG_CONFIG_PATH := ${HOME}/.opencv/install/OpenCV-${OPENCV_VERSION}/${OPENCV_LIBS}/lib/pkgconfig
 #=======================================
