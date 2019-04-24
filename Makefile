@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 
 OS_VERSION :=
-OPENCV_VERSION :=
+OPENCV_VERSION := 4.1.0
 # "static" or "shared"
 OPENCV_LIBS := static
 
@@ -19,10 +19,6 @@ CLEAN_LIST := ${CLEAN_LIST} $(addsuffix .o,${CLEAN_LIST})
 #===============================================================================
 #===============================================================================
 #===============================================================================
-ifndef OPENCV_VERSION
-$(error "'OPENCV_VERSION' variable should be set.")
-endif
-
 ifneq (${OPENCV_LIBS}, static)
 ifneq (${OPENCV_LIBS}, shared)
 $(error "'OPENCV_LIBS' variable should be set. ('static' or 'shared')")
