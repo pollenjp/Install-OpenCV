@@ -1,6 +1,3 @@
-#
-# 
-
 # CMakeのバージョンを設定
 # block comment (>=3.0)
 # `CMAKE_CXX_STANDARD` variable (>=3.1)
@@ -24,31 +21,13 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -O0")
 #                        #[[ <INTERFACE|PUBLIC|PRIVATE> ]] PUBLIC
 #                        #[[ [items1...] ]] cxx_std_11)
 
-option(#[[ <option_variable> ]] OPENCV_VERSION
-       #[[ "help string describing option" ]] "OpenCV PKG_CONFIG_PATH '<PATH>' or 'OFF'"
-       #[[ [initial value] ]] OFF)
-option(#[[ <option_variable> ]] OPENCV_PKG_CONFIG_PATH
-       #[[ "help string describing option" ]] "OpenCV PKG_CONFIG_PATH '<PATH>' or 'OFF'"
-       #[[ [initial value] ]] OFF)
-#set(PKG_CONFIG_PATH ${PKG_CONFIG_PATH} ${OPENCV_PKG_CONFIG_PATH})
-set(ENV{PKG_CONFIG_PATH} "${OPENCV_PKG_CONFIG_PATH}:$ENV{PKG_CONFIG_PATH}")
-
-# [pkg config - set PKG_CONFIG_PATH in cmake - Stack Overflow](https://stackoverflow.com/questions/44487053/set-pkg-config-path-in-cmake)
-find_package(PkgConfig REQUIRED)
-
-# [CMake express the "greater or equal" statement - Stack Overflow](https://stackoverflow.com/a/16668344)
-# opencv version 4 or not
-if (OPENCV_VERSION GREATER_EQUAL 4.0.0)
-  pkg_check_modules(PKG_OPENCV REQUIRED opencv4)
-else()
-  pkg_check_modules(PKG_OPENCV REQUIRED opencv)
-endif()
-
-include_directories(${PKG_OPENCV_INCLUDE_DIRS})
-
 add_executable(#[[ <name>  ]] check-opencv-version
                #[[ source1 ]] check-opencv-version.cpp)
 
+include(#[[<file|module>]] ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/FindOpenCV.cmake)
+
+# PKG_OPENCV_LDFLAGS
+# [pkg config - set PKG_CONFIG_PATH in cmake - Stack Overflow](https://stackoverflow.com/a/44489201/9316234)
 target_link_libraries(#[[ <target> ]] check-opencv-version
-                      #[[ <item> ]] ${PKG_OPENCV_LDFLAGS})
+                      #[[ <item>   ]] ${PKG_OPENCV_LDFLAGS})
 
