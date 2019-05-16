@@ -24,6 +24,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -O0")
 add_executable(#[[ <name>  ]] check-opencv-version
                #[[ source1 ]] check-opencv-version.cpp)
 
+# [CMake: モジュール - Qiita](https://qiita.com/mrk_21/items/ab32a83a12f5d37acc64)
+# [opencv - Could not find module FindOpenCV.cmake ( Error in configuration process) - Stack Overflow](https://stackoverflow.com/a/8714718)
 include(#[[<file|module>]] ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/FindOpenCV.cmake)
 
 # PKG_OPENCV_LDFLAGS
